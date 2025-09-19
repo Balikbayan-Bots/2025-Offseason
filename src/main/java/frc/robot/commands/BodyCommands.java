@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.body.ArmSubsystem;
 import frc.robot.subsystems.body.BodySetpoint;
@@ -13,7 +13,7 @@ public class BodyCommands {
   private static ArmSubsystem arm = ArmSubsystem.getInstance();
 
   public static Command armSetpointRun(BodySetpoint setpoint) {
-    return new InstantCommand(
+    return new RunCommand(
         () -> {
           arm.updateSetpoint(setpoint);
         },
@@ -21,7 +21,7 @@ public class BodyCommands {
   }
 
   public static Command elevSetpointRun(BodySetpoint setpoint) {
-    return new InstantCommand(
+    return new RunCommand(
         () -> {
           elev.updateSetpoint(setpoint);
         },
@@ -56,5 +56,11 @@ public class BodyCommands {
     return new SequentialCommandGroup(
         elevSetpointRun(BodySetpoint.STOW_INTAKE).until(elev::isAtSetpoint),
         armSetpointRun(BodySetpoint.STOW_INTAKE).until(arm::isAtSetpoint));
+  }
+
+  public static Command positionTest() {
+    return new SequentialCommandGroup(
+        elevSetpointRun(BodySetpoint.STOW_NO_CORAL).until(elev::isAtSetpoint),
+        armSetpointRun(BodySetpoint.STOW_NO_CORAL).until(arm::isAtSetpoint));
   }
 }

@@ -10,7 +10,8 @@ public enum BodySetpoint {
   STOW_INTAKE(14.0, 0.0),
   HIGH_NET(26.0, 70.0),
   PROCESSOR(0.0, 0.0),
-  SCORE(0.0, 90.0);
+  SCORE(0.0, 90.0),
+  STOW_NO_CORAL(17.75, 180.0);
 
   private final double elevTravel;
   private final double armDegrees;

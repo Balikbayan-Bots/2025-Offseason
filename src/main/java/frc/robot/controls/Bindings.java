@@ -1,7 +1,6 @@
 package frc.robot.controls;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -49,6 +48,7 @@ public class Bindings {
     Controls.Setpoint.lvlTwo.onTrue(BodyCommands.positionLevelTwo());
     Controls.Setpoint.lvlThree.onTrue(BodyCommands.positionLevelThree());
     Controls.Setpoint.lvlFour.onTrue(BodyCommands.positionLevelFour());
+    Controls.Setpoint.testStow.onTrue(BodyCommands.positionTest());
   }
 
   public static Command score() {

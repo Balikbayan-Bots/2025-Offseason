@@ -1,11 +1,11 @@
 package frc.robot.controls;
 
-import static frc.robot.subsystems.swerve.SwerveConstants.MAX_TELEOP_ROT;
-import static frc.robot.subsystems.swerve.SwerveConstants.MAX_TELEOP_SPEED;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import java.util.function.Supplier;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_TELEOP_ROT;
+import static frc.robot.subsystems.swerve.SwerveConstants.MAX_TELEOP_SPEED;
 
 public class Controls {
   private static OperatorInterface oi = OperatorInterface.getInstance();
@@ -67,6 +67,8 @@ public class Controls {
     public static final Trigger lvlFour = coDriver.y();
 
     public static final Trigger stow = coDriver.povDown();
+
+    public static final Trigger testStow = coDriver.povUp();
   }
 
   public class Climb {
