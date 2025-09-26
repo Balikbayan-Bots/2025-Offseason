@@ -23,7 +23,7 @@ public class ClawSubsystem extends SubsystemBase {
     return m_instance;
   }
 
-  private ClawState state;
+  private ClawState state = ClawState.IDLE;
 
   private TalonFX motor;
   private DigitalInput beamBreak;
@@ -31,7 +31,6 @@ public class ClawSubsystem extends SubsystemBase {
   private ClawSubsystem() {
     motor = new TalonFX(CLAW_MOTOR_ID);
     beamBreak = new DigitalInput(BEAM_BREAK_ID);
-    state = ClawState.IDLE;
     configureclaw(motor);
     BaseStatusSignal.setUpdateFrequencyForAll(200, motor.getPosition(), motor.getVelocity());
     BaseStatusSignal.setUpdateFrequencyForAll(
@@ -76,7 +75,6 @@ public class ClawSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     motor.set(state.getSpeed());
   }
 

@@ -143,8 +143,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     return (rotations / ELEV_GEAR_RATIO) * ELEV_SPROCKET_CIRCUMFERENCE;
   }
 
+  public boolean isAtSetpoint(double toleranceInches) {
+    return Math.abs(getError()) < toleranceInches; // used to be 2.5
+  }
+
   public boolean isAtSetpoint() {
-    return Math.abs(getError()) < 0.25;
+    return isAtSetpoint(2.5);
   }
 
   @Override
@@ -166,5 +170,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     builder.addDoubleProperty("Refrence", this::getReferenceInches, null);
     builder.addDoubleProperty("Error", this::getError, null);
     builder.addDoubleProperty("Inches", this::getInches, null);
+    builder.addBooleanProperty("Is At Setpoint", this::isAtSetpoint, null);
   }
 }

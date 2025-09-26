@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
     robotContainer = new RobotContainer();
 
     Megatag.addLimelight(LimelightConfigs.ReefLimelight);
-    Megatag.addLimelight(LimelightConfigs.HPLimelight);
+    Megatag.addLimelight(LimelightConfigs.IntakeLimelight);
   }
 
   @Override

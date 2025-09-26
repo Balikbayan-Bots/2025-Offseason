@@ -105,7 +105,7 @@ tasks.withType(JavaCompile) {
 }
 
 // spotless config
-spotless {
+spotless { //to run do ./gradlew spotlessApply
     java {
         // Apply to all java files in the main source set
         target 'src/main/java/**/*.java'

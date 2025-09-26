@@ -107,10 +107,9 @@ public class ArmSubsystem extends SubsystemBase {
     updateReference(activeSetpoint.getArmDegrees());
     motor.setControl(
         motionMagic
-            .withPosition((refrenceDegrees / 360) * ARM_GEAR_RATIO)
+            .withPosition(degreesToMotorRotations(refrenceDegrees))
             .withSlot(0)
             .withFeedForward(calculateFeedForward()));
-    // motor.setControl(new CoastOut());
   }
 
   private double calculateFeedForward() {
@@ -137,8 +136,12 @@ public class ArmSubsystem extends SubsystemBase {
     return getReferenceDegrees() - getDegrees();
   }
 
+  public boolean isAtSetpoint(double toleranceDegrees) {
+    return Math.abs(getError()) < toleranceDegrees; // used to be 1.0
+  }
+
   public boolean isAtSetpoint() {
-    return Math.abs(getError()) < 1.0;
+    return isAtSetpoint(1.0);
   }
 
   @Override
@@ -148,5 +151,6 @@ public class ArmSubsystem extends SubsystemBase {
     builder.addDoubleProperty("Reference", this::getReferenceDegrees, null);
     builder.addDoubleProperty("Error", this::getError, null);
     builder.addDoubleProperty("Feed Forward", this::calculateFeedForward, null);
+    builder.addBooleanProperty("Is At Setpoint", this::isAtSetpoint, null);
   }
 }

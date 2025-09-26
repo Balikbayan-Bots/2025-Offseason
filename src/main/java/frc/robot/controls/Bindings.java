@@ -26,7 +26,7 @@ public class Bindings {
     Controls.Swerve.reorient.onTrue(SwerveCommands.reorient());
 
     // Controls.Swerve.test
-    //     .onTrue(SwerveCommands.driveToPose(new Pose2d(16.25, 6.85,
+    // .onTrue(SwerveCommands.driveToPose(new Pose2d(16.25, 6.85,
     // Rotation2d.fromDegrees(142.286))));
 
     Telemetry logger = new Telemetry(SwerveConstants.SPEED_AT_12V.in(MetersPerSecond));
@@ -34,21 +34,29 @@ public class Bindings {
   }
 
   public static void configureClawBinds() {
-    Controls.Manipulators.intake
-        .whileTrue(ManipulatorCommands.beamIntake())
-        .onFalse(ManipulatorCommands.stopIntake());
-    Controls.Manipulators.outake
-        .whileTrue(ManipulatorCommands.runOutake())
-        .onFalse(ManipulatorCommands.stopIntake());
-    Controls.Manipulators.score.onTrue(score()).onFalse(ManipulatorCommands.stopIntake());
+    Controls.Manipulators.intake.whileTrue(ManipulatorCommands.beamIntake());
+    // .onFalse(ManipulatorCommands.stopIntake());
+    // Controls.Manipulators.outake
+    //     .whileTrue(ManipulatorCommands.runOutake())
+    //     .onFalse(ManipulatorCommands.stopIntake());
+
+    // Controls.Manipulators.score.onTrue(score()).onFalse(ManipulatorCommands.stopIntake());
   }
 
   public static void configureBodyBinds() {
     Controls.Setpoint.stow.onTrue(BodyCommands.positionStow());
-    Controls.Setpoint.lvlOne.onTrue(BodyCommands.positionLevelOne());
+    Controls.Setpoint.lvlOne.onTrue(ManipulatorCommands.intakeLevelOne());
     Controls.Setpoint.lvlTwo.onTrue(BodyCommands.positionLevelTwo());
     Controls.Setpoint.lvlThree.onTrue(BodyCommands.positionLevelThree());
     Controls.Setpoint.lvlFour.onTrue(BodyCommands.positionLevelFour());
+  }
+
+  public static void configureIntakeBinds() {
+    Controls.Manipulators.intakeLevelOne.onTrue(intakeLevelOne());
+    Controls.Manipulators.groundIntake
+        .whileTrue(groundIntake())
+        .onFalse(ManipulatorCommands.intakeLevelHandoff());
+    Controls.Manipulators.handOverIntake.whileTrue(ManipulatorCommands.handover());
   }
 
   public static Command score() {
@@ -57,5 +65,13 @@ public class Bindings {
         ManipulatorCommands.score(),
         new WaitCommand(0.5),
         BodyCommands.positionStow());
+  }
+
+  public static Command intakeLevelOne() {
+    return ManipulatorCommands.intakeLevelOne();
+  }
+
+  public static Command groundIntake() {
+    return ManipulatorCommands.groundIntake();
   }
 }
