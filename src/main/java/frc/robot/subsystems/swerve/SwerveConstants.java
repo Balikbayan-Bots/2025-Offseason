@@ -1,13 +1,13 @@
 package frc.robot.subsystems.swerve;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
+
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 public class SwerveConstants {
   public static final LinearVelocity SPEED_AT_12V = MetersPerSecond.of(5.84);
 
-  public static final Double MAX_TELEOP_SPEED = 0.8 * SPEED_AT_12V.in(MetersPerSecond);
+  public static final Double MAX_TELEOP_SPEED = 0.5 * SPEED_AT_12V.in(MetersPerSecond);
   public static final Double MAX_TELEOP_ROT = 0.5 * RotationsPerSecond.of(1.5).in(RadiansPerSecond);
 
   public static final Module FRONT_LEFT_MODULE = new Module(Rotations.of(0.39892578125));

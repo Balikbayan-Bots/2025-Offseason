@@ -104,6 +104,10 @@ tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
 
+tasks.build {
+    dependsOn tasks.spotlessApply
+}
+
 // spotless config
 spotless {
     java {
