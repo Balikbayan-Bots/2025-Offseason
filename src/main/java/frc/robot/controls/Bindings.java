@@ -8,12 +8,15 @@ import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.swerve.Telemetry;
+import frc.robot.vision.IntakeLimelightSubsystem;
 
 public class Bindings {
   private static SwerveSubsystem swerve = SwerveSubsystem.getInstance();
+  private static IntakeLimelightSubsystem IntakeLimelight = IntakeLimelightSubsystem.getInstance();
 
   private Bindings() {
     throw new IllegalStateException("Utility class");
+
   }
 
   public static void configureSwerveBinds() {
@@ -27,6 +30,10 @@ public class Bindings {
 
     Telemetry logger = new Telemetry(SwerveConstants.SPEED_AT_12V.in(MetersPerSecond));
     swerve.registerTelemetry(logger::telemeterize);
+
+    Controls.Swerve.LimelightIntake
+        .whileTrue(SwerveCommands.limelightIntakeCommand(IntakeLimelight,0))
+        .onFalse(ManipulatorCommands.intakeLevelHandoff());
   }
 
   public static void configureClawBinds() {

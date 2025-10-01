@@ -41,6 +41,8 @@ public class Controls {
 
     /*** Driver 'Start' */
     public static final Trigger reorient = driver.start();
+
+    public static final Trigger LimelightIntake = driver.a();
   }
 
   public final class Debug {

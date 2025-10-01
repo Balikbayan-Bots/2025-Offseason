@@ -19,6 +19,7 @@ public class BodyConstants {
 
   public static final double ELEV_MAX_VOLTAGE_FWD = 12;
   public static final double ELEV_MAX_VOLATGE_REVERSE = -4;
+  public static final double ELEV_MAX_POS = 27;
 
   public static final double[] ELEV_SLOT_ZERO = {
     2.0, // kP
