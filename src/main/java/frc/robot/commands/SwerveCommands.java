@@ -3,17 +3,27 @@ package frc.robot.commands;
 import static frc.robot.subsystems.swerve.SwerveConstants.MAX_TELEOP_ROT;
 import static frc.robot.subsystems.swerve.SwerveConstants.MAX_TELEOP_SPEED;
 
+import java.util.Optional;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.LinearVelocityUnit;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.controls.Controls;
 import frc.robot.subsystems.body.BodyConstants;
 import frc.robot.subsystems.body.ElevatorSubsystem;
@@ -24,6 +34,9 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.vision.IntakeLimelightSubsystem;
 import frc.robot.vision.IntakeLimelightSubsystem.AimingState;
+import frc.robot.vision.LimelightConfigs;
+import frc.robot.vision.LimelightHelpers;
+import frc.robot.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.vision.LimelightSubsystem;
 
 public class SwerveCommands {
@@ -102,74 +115,84 @@ public class SwerveCommands {
             ));
   }
 
-  public Command aimAndDriveToTarget(LimelightSubsystem subsys) {
+  public static Command driveToVisionTarget() {
+    PathConstraints constraints =
+        new PathConstraints(
+            SwerveConstants.SPEED_AT_12V.in(edu.wpi.first.units.Units.MetersPerSecond) * 0.75,
+            4.0,
+            Units.degreesToRadians(540),
+            Units.degreesToRadians(720));
 
-    boolean targetVisible = subsys.getTv();
-    long currentTimeMillis = System.currentTimeMillis();
-    double dtSeconds = (currentTimeMillis - lastTimeMillis) / 1000.0;
-    lastTimeMillis = currentTimeMillis;
+    // Desired offset from the center of the intake target to the robot's center
+    // This makes the robot stop X meters away from the target
+    final double TARGET_X_OFFSET = 0.5; // Example: Stop 0.5 meters away
 
-    if (targetVisible) {
-      intakeLimelight.currentAimingState = AimingState.ACTIVE_AIM;
-      tyErrorTraveled = 0.0;
+    // This is the core logic: a command that is created *only* if a target is visible.
+    Command targetDriveCommand = Commands.defer(
+        () -> {
+          // 1. Get the latest pose estimate from the Intake Limelight
+          LimelightHelpers.PoseEstimate estimate =
+              LimelightHelpers.getBotPoseEstimate_wpiBlue(
+                  LimelightConfigs.IntakeLimelight.name());
 
-    } else if (intakeLimelight.currentAimingState == AimingState.ACTIVE_AIM) {
-      intakeLimelight.currentAimingState = AimingState.COASTING;
-      coastingTyError = -subsys.getTy();
+          // 2. Check if the target is valid (using the recommended criteria)
+          if (estimate.tagCount > 0 && intakeLimelight.getTv()) {
+            // Target is valid, calculate the field target pose
+            Pose2d currentTargetPose = estimate.pose;
 
-    } else if (intakeLimelight.currentAimingState == AimingState.COASTING) {
-      if (isCoastFinished()) {
-        intakeLimelight.currentAimingState = AimingState.IDLE;
-      }
+            // Calculate the final target pose: current target X/Y, but offset by X_OFFSET along the approach vector
+            Pose2d finalTargetPose = new Pose2d(
+                currentTargetPose.getX() - TARGET_X_OFFSET * currentTargetPose.getRotation().getCos(),
+                currentTargetPose.getY() - TARGET_X_OFFSET * currentTargetPose.getRotation().getSin(),
+                currentTargetPose.getRotation()
+            );
 
-      if (intakeLimelight.currentAimingState == AimingState.ACTIVE_AIM) {
-        double rotationCommand = -subsys.alignRz();
-        double forwardCommand = -subsys.alignTy() * getDriveMultiplier(true);
+            // 3. Return the PathPlanner command to drive to the calculated field position
+            return AutoBuilder.pathfindToPose(
+                finalTargetPose,
+                constraints,
+                0.0 // Goal End Velocity (stop at the target)
+            ).withTimeout(4.0); // Safety timeout
 
-        lastRotationCommand = rotationCommand;
-        lastForwardCommand = forwardCommand;
-
-      return  executeDrive(forwardCommand, rotationCommand, dtSeconds);
-
-      } else if (intakeLimelight.currentAimingState == AimingState.COASTING) {
-
-       return executeDrive(lastForwardCommand, lastRotationCommand, dtSeconds);
-      }
-
-    } else {
-
-      lastForwardCommand = 0.0;
-      lastRotationCommand = 0.0;
-     return executeDrive(lastForwardCommand, lastRotationCommand, dtSeconds);
-    }
-      return null;
+          } else {
+            // Target not found or invalid: stop the robot immediately.
+            System.out.println("Limelight target lost or invalid. Stopping movement.");
+            // ApplyChassisSpeeds uses zero velocity if instantiated without arguments
+            // We use .applyRequest to wrap the SwerveRequest in a runnable command.
+            
+            return swerve.applyRequest(() -> new SwerveRequest.ApplyRobotSpeeds().withSpeeds(new ChassisSpeeds(0, 0, 0)));    
     
+          }
+        },
+        java.util.Set.of(swerve, intakeLimelight) // Requirements for the deferred command
+    );
+
+    // This command runs the target drive command (either pathfind or stop)
+    // The command immediately checks the state upon starting (button press)
+    return new ParallelCommandGroup(
+        targetDriveCommand,
+        intakeSetpointRun(IntakeSetpoint.DEPLOYED) // Run intake deploy parallel to driving
+        );
   }
 
-  private Command executeDrive(double forwardCmd, double rotationCmd, double dtSeconds) {
 
-    swerve.applyRequest(
-        () -> limlightDrive.withVelocityX(forwardCmd).withRotationalRate(rotationCmd));
-
-    if (intakeLimelight.currentAimingState == AimingState.COASTING) {
-      double estimatedTyChange =
-          Math.abs(lastForwardCommand * SwerveConstants.MAX_TELEOP_SPEED * dtSeconds);
-      tyErrorTraveled += estimatedTyChange;
+  /** Helper method to retrieve the latest valid MegaTag pose */
+  private static Optional<PoseEstimate> getLatestValidTargetPose(String limelightName) {
+    PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+    
+    // Check if a target is visible and the pose estimate is considered valid 
+    // (using Megatag, we generally look for at least one tag)
+    if (poseEstimate == null || poseEstimate.tagCount == 0 || poseEstimate.pose.equals(new Pose2d())) {
+      return Optional.empty();
     }
-        return null;
+    
+    // Note: Ambiguity check (0.7) should ideally be done in the MegaTag subsystem periodic loop
+    // before adding the measurement to odometry, but we can check here too if needed.
+    
+    return Optional.of(poseEstimate);
   }
 
-  private boolean isCoastFinished() {
-    if (tyErrorTraveled >= Math.abs(coastingTyError)) {
-      System.out.println("COAST ENDED");
-      return true;
-    }
-    if (Math.abs(lastForwardCommand) < 0.01) {
-      return true;
-    }
-    return false;
-  }
-
+ 
   public static double getDriveMultiplier(boolean limelight) {
     double currentPos = elevator.getInches();
     double maxPos = BodyConstants.ELEV_MAX_POS;

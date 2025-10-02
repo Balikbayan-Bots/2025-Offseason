@@ -17,6 +17,32 @@ public class IntakeLimelightSubsystem extends SubsystemBase implements Limelight
     return m_instance;
   }
 
+    // --- Constants Class for Command Access ---
+  // These values should be tuned for the specific Limelight aiming pipeline
+  public static class AimingConstants {
+    // P-Control Gains
+    public static final double kPRot = 0.04;      // P-gain for Rotation (tx -> 0)
+    public static final double kTyP = 0.5;        // P-gain for Forward movement (ty -> kTargetTy)
+    
+    // Target & Tolerance
+    // Since crosshair A is moved, this should be 0.0, which means the center of the image.
+    public static final double kTargetTy = 0.0;   
+    public static final double kMinRotCommand = 0.02; // Minimum rotation power to overcome inertia
+    public static final double kStoppingTyError = 0.1; // Tolerance for stopping (in degrees)
+    
+    // Coasting Estimation (TUNE THIS CAREFULLY)
+    // Max TY degree change per unit of commanded speed (1.0 = Max Speed) per second
+    public static final double kMaxTyChangeRate = 0.2; 
+    public static final double kMaxSpeed = 0.8; // Max forward speed for clamping (0 to 1.0)
+  }
+
+    public enum AimingState {
+    IDLE,
+    ACTIVE_AIM,
+    COASTING,
+    DONE // Added DONE state for command completion clarity
+  }
+
   private NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight-cbotint");
   private double x;
   private double y;
@@ -43,21 +69,6 @@ public class IntakeLimelightSubsystem extends SubsystemBase implements Limelight
   private double limelightMountX = 8.589;
   private double limelihgtMountY = 3.325;
   private double krot = 0.2;
-
-  public enum AimingState {
-    IDLE,
-    ACTIVE_AIM,
-    COASTING
-  }
-
-  public AimingState currentAimingState = AimingState.IDLE;
-
-  public double lastForwardcommand = 0;
-  public double lastRotationCommand = 0;
-
-  public static final double kTargetTy = 0.0;
-  public static final double kTyP = 0.5;
-  public static final double kStoppingTyError = 0.1;
 
   public double alignTx() {
     return x_output;
@@ -96,6 +107,10 @@ public class IntakeLimelightSubsystem extends SubsystemBase implements Limelight
 
   public boolean getTv() {
     return Tv;
+  }
+
+    public boolean hasTarget() {
+      return Tv;
   }
 
   public void setPipeline(int pipeline) {
