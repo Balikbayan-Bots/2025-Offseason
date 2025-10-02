@@ -21,6 +21,7 @@ public class IntakeLimelightSubsystem extends SubsystemBase implements Limelight
   private double x;
   private double y;
   private double rZ;
+  private boolean Tv;
 
   private double x_kP = 0.07D;
   private double x_kD = 0.0;
@@ -29,13 +30,34 @@ public class IntakeLimelightSubsystem extends SubsystemBase implements Limelight
   private double x_outputAlgea = 0.0;
   private PIDController tx_controller = new PIDController(x_kP, 0.0, x_kD);
 
-  private double rZ_kP = 0.2D;
+  private double rZ_kP = 0.6D;
   private double y_kP = 0.055D;
   private double y_kD = 0.0D;
   private double y_targetAlgea = -1.42;
   private double y_output = 0.0;
   private double y_outputAlgea = 0.0;
   private PIDController ty_controller = new PIDController(y_kP, 0.0, y_kD);
+
+  private double limelightMountingAngleDegrees = 31.475;
+  private double limelightMountZ = 30.345;
+  private double limelightMountX = 8.589;
+  private double limelihgtMountY = 3.325;
+  private double krot = 0.2;
+
+  public enum AimingState {
+    IDLE,
+    ACTIVE_AIM,
+    COASTING
+  }
+
+  public AimingState currentAimingState = AimingState.IDLE;
+
+  public double lastForwardcommand = 0;
+  public double lastRotationCommand = 0;
+
+  public static final double kTargetTy = 0.0;
+  public static final double kTyP = 0.5;
+  public static final double kStoppingTyError = 0.1;
 
   public double alignTx() {
     return x_output;
@@ -54,7 +76,7 @@ public class IntakeLimelightSubsystem extends SubsystemBase implements Limelight
   }
 
   public double alignRz() {
-    double output = rZ * rZ_kP;
+    double output = x * krot;
     return output;
   }
 
@@ -67,7 +89,13 @@ public class IntakeLimelightSubsystem extends SubsystemBase implements Limelight
   }
 
   private double getRz() {
-    return rZ;
+
+    return -x * krot;
+    // return rZ;
+  }
+
+  public boolean getTv() {
+    return Tv;
   }
 
   public void setPipeline(int pipeline) {
@@ -83,6 +111,7 @@ public class IntakeLimelightSubsystem extends SubsystemBase implements Limelight
     x = limelight.getEntry("tx").getDouble(0);
     limelight.getEntry("ta").getDouble(0);
     y = limelight.getEntry("ty").getDouble(0);
+    Tv = limelight.getEntry("tv").getDouble(0) == 1;
     rZ =
         LimelightHelpers.pose3dToArray(
             LimelightHelpers.getTargetPose3d_CameraSpace("limelight-Intake"))[4];

@@ -63,7 +63,7 @@ public class BodyCommands {
 
   public static Command positionLevelFour() {
     return new SequentialCommandGroup(
-        elevSetpointRun(BodySetpoint.CORAL_LEVEL4), 
+        elevSetpointRun(BodySetpoint.CORAL_LEVEL4),
         new WaitCommand(1.0),
         armSetpointRun(BodySetpoint.CORAL_LEVEL4)
         // elevSetpointRun(BodySetpoint.CORAL_LEVEL4).until(() -> elev.isAtSetpoint()),

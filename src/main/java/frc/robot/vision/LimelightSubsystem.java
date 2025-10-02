@@ -12,5 +12,7 @@ public interface LimelightSubsystem {
 
   double getTy();
 
+  boolean getTv();
+
   void setPipeline(int val);
 }

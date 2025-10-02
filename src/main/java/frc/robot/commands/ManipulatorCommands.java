@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.util.Map;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -18,6 +16,7 @@ import frc.robot.subsystems.manipulators.ClawSubsystem;
 import frc.robot.subsystems.manipulators.IntakeSetpoint;
 import frc.robot.subsystems.manipulators.IntakeState;
 import frc.robot.subsystems.manipulators.IntakeSubsytem;
+import java.util.Map;
 
 public class ManipulatorCommands {
 
@@ -27,11 +26,11 @@ public class ManipulatorCommands {
   private static ArmSubsystem arm = ArmSubsystem.getInstance();
 
   private static Command setClawState(ClawState state) {
-        return new RunCommand(
-            () -> {
-              claw.setState(state);
-            },
-            claw);
+    return new RunCommand(
+        () -> {
+          claw.setState(state);
+        },
+        claw);
   }
 
   private static Command setIntakeState(IntakeState state) {
@@ -75,27 +74,22 @@ public class ManipulatorCommands {
     return new SequentialCommandGroup(
         new SelectCommand<>(
             Map.of(
-            BodySetpoint.CORAL_LEVEL2, BodyCommands.armSetpointRun(BodySetpoint.SCORE_LEVEL2),
-            BodySetpoint.CORAL_LEVEL3, BodyCommands.armSetpointRun(BodySetpoint.SCORE),
-            BodySetpoint.CORAL_LEVEL4, BodyCommands.armSetpointRun(BodySetpoint.SCORE)
-            ),
+                BodySetpoint.CORAL_LEVEL2, BodyCommands.armSetpointRun(BodySetpoint.SCORE_LEVEL2),
+                BodySetpoint.CORAL_LEVEL3, BodyCommands.armSetpointRun(BodySetpoint.SCORE),
+                BodySetpoint.CORAL_LEVEL4, BodyCommands.armSetpointRun(BodySetpoint.SCORE)),
             () -> arm.getCurrentSetpoint()),
         new WaitCommand(0.1),
         new SequentialCommandGroup(
             new ParallelCommandGroup(
                 setClawState(ClawState.SCORE).withTimeout(0.001),
-                SwerveCommands.backUp().withTimeout(1.0)
-            ),
+                SwerveCommands.backUp().withTimeout(1.0)),
             new ParallelCommandGroup(
-            BodyCommands.elevSetpointRun(BodySetpoint.SAFE_STOW).until(elevator::isAtSetpoint),
-            BodyCommands.armSetpointRun(BodySetpoint.SAFE_STOW).until(arm::isAtSetpoint)
-            )
-        ),
+                BodyCommands.elevSetpointRun(BodySetpoint.SAFE_STOW).until(elevator::isAtSetpoint),
+                BodyCommands.armSetpointRun(BodySetpoint.SAFE_STOW).until(arm::isAtSetpoint))),
         new ParallelCommandGroup(
             stopIntake().withTimeout(0.001),
             BodyCommands.armSetpointRun(BodySetpoint.STOW_POS).until(arm::isAtSetpoint),
-            BodyCommands.elevSetpointRun(BodySetpoint.STOW_POS).until(elevator::isAtSetpoint)
-        ));
+            BodyCommands.elevSetpointRun(BodySetpoint.STOW_POS).until(elevator::isAtSetpoint)));
   }
 
   public static Command scoreLevelOne() {

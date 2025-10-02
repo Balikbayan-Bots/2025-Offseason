@@ -1,6 +1,7 @@
 package frc.robot.controls;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.BodyCommands;
 import frc.robot.commands.ManipulatorCommands;
@@ -16,7 +17,6 @@ public class Bindings {
 
   private Bindings() {
     throw new IllegalStateException("Utility class");
-
   }
 
   public static void configureSwerveBinds() {
@@ -31,8 +31,8 @@ public class Bindings {
     Telemetry logger = new Telemetry(SwerveConstants.SPEED_AT_12V.in(MetersPerSecond));
     swerve.registerTelemetry(logger::telemeterize);
 
-    Controls.Swerve.LimelightIntake
-        .whileTrue(SwerveCommands.limelightIntakeCommand(IntakeLimelight,0))
+    Controls.Swerve.LimelightIntake.whileTrue(
+            SwerveCommands.aimAndDriveToTarget(IntakeLimelight))
         .onFalse(ManipulatorCommands.intakeLevelHandoff());
   }
 
@@ -43,9 +43,8 @@ public class Bindings {
     //     .whileTrue(ManipulatorCommands.runOutake())
     //     .onFalse(ManipulatorCommands.stopIntake());
 
-    Controls.Manipulators.score
-        .onTrue(ManipulatorCommands.score());
-        //.onFalse(ManipulatorCommands.stopIntake());
+    Controls.Manipulators.score.onTrue(ManipulatorCommands.score());
+    // .onFalse(ManipulatorCommands.stopIntake());
   }
 
   public static void configureBodyBinds() {
@@ -65,13 +64,13 @@ public class Bindings {
     Controls.Manipulators.scoreLevelOne.onTrue(ManipulatorCommands.scoreLevelOne());
   }
 
-// public static Command score() {
-   // return new SequentialCommandGroup(
-     //   BodyCommands.armSetpointRun(BodySetpoint.SCORE),
-       // ManipulatorCommands.score(),
- //       n/ew WaitCommand(0.5),
- //       BodyCommands.positionStow());
-  //}
+  // public static Command score() {
+  // return new SequentialCommandGroup(
+  //   BodyCommands.armSetpointRun(BodySetpoint.SCORE),
+  // ManipulatorCommands.score(),
+  //       n/ew WaitCommand(0.5),
+  //       BodyCommands.positionStow());
+  // }
 
   public static Command intakeLevelOne() {
     return ManipulatorCommands.intakeLevelOne();

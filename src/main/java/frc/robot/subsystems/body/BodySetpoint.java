@@ -3,7 +3,7 @@ package frc.robot.subsystems.body;
 public enum BodySetpoint {
   START_CONFIG(0.0, 0.0),
   SAFE_START(18.0, 90),
-  //CORAL_LEVEL1(0.0, 90.0),
+  // CORAL_LEVEL1(0.0, 90.0),
   CORAL_LEVEL2(2.0, 45.0),
   CORAL_LEVEL3(10.0, 45.0),
   CORAL_LEVEL4(24.0, 55.0),
