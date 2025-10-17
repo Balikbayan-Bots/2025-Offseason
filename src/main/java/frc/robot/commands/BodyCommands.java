@@ -141,4 +141,15 @@ public class BodyCommands {
             armSetpointRun(BodySetpoint.START_CONFIG).until(arm::isAtSetpoint),
             elevSetpointRun(BodySetpoint.START_CONFIG).until(arm::isAtSetpoint)));
   }
+
+  public static Command zeroElev() {
+    return new SequentialCommandGroup(
+            positionStart(), 
+            new RunCommand(() -> elev.setSpeed(0.25)).until(() -> elev.getMagnetSensor()),
+            new WaitCommand(0.2),
+            new InstantCommand(() -> elev.setSpeed(0)),
+            new InstantCommand(() -> elev.reZero()),
+            new WaitCommand(0.1),
+            elevSetpointRun(BodySetpoint.START_CONFIG));
+  }
 }

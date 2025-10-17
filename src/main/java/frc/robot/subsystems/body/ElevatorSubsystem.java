@@ -2,6 +2,7 @@ package frc.robot.subsystems.body;
 
 import static frc.robot.subsystems.body.BodyConstants.ELEV_FEED_FWD;
 import static frc.robot.subsystems.body.BodyConstants.ELEV_GEAR_RATIO;
+import static frc.robot.subsystems.body.BodyConstants.ELEV_MAGNET_ID;
 import static frc.robot.subsystems.body.BodyConstants.ELEV_MAX_VOLATGE_REVERSE;
 import static frc.robot.subsystems.body.BodyConstants.ELEV_MAX_VOLTAGE_FWD;
 import static frc.robot.subsystems.body.BodyConstants.ELEV_MOTION_MAGIC_CONFIGS;
@@ -20,6 +21,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -39,10 +41,12 @@ public class ElevatorSubsystem extends SubsystemBase {
   private TalonFX rightMotor;
   private MotionMagicVoltage motionMagic;
   private BodyStates state = BodyStates.SETPOINT;
+  private DigitalInput magnetSenor;
 
   public ElevatorSubsystem() {
     leftMotor = new TalonFX(ELEV_MOTOR_LEFT);
     rightMotor = new TalonFX(ELEV_MOTOR_RIGHT);
+    magnetSenor = new DigitalInput(ELEV_MAGNET_ID);
     configureElev(leftMotor, null);
     configureElev(rightMotor, leftMotor);
     reZero();
@@ -124,6 +128,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     state = BodyStates.MANUAL;
     leftMotor.set(speed);
     rightMotor.set(speed);
+  }
+
+  public boolean getMagnetSensor() {
+    return !magnetSenor.get();
   }
 
   public double getRotations() {
