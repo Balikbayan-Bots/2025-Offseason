@@ -144,8 +144,7 @@ public class BodyCommands {
 
   public static Command zeroElev() {
     return new SequentialCommandGroup(
-        positionStart(),
-        new RunCommand(() -> elev.setSpeed(0.25)).until(() -> elev.getMagnetSensor()),
+        new RunCommand(() -> elev.setSpeed(0.50)).until(() -> elev.getMagnetSensor()),
         new WaitCommand(0.2),
         new InstantCommand(() -> elev.setSpeed(0)),
         new InstantCommand(() -> elev.reZero()),

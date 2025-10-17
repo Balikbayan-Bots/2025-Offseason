@@ -3,7 +3,7 @@ package frc.robot.subsystems.body;
 public class BodyConstants {
   public static final int ELEV_MOTOR_LEFT = 20;
   public static final int ELEV_MOTOR_RIGHT = 21;
-  public static final int ELEV_MAGNET_ID = -1;
+  public static final int ELEV_MAGNET_ID = 0;
 
   public static final int ARM_MOTOR_ID = 30;
   public static final int ARM_MAGNET_ID = -1;
