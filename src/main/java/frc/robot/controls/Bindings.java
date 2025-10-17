@@ -3,6 +3,7 @@ package frc.robot.controls;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.BodyCommands;
 import frc.robot.commands.ManipulatorCommands;
 import frc.robot.commands.SwerveCommands;
@@ -24,7 +25,9 @@ public class Bindings {
     Controls.Swerve.reorient.onTrue(SwerveCommands.reorient());
 
     // Controls.Debug.megatagTest.onTrue(SwerveCommands.driveTagNineLeft());
-
+    Controls.Swerve.slow.onTrue(
+      new InstantCommand(() -> {swerve.toggleSlowMode();}, swerve)
+    );
     Controls.Swerve.rightPeg.onTrue(SwerveCommands.driveToPegProxy(SwervePositions.alignMent.RIGHT));
     Controls.Swerve.leftPeg.onTrue(SwerveCommands.driveToPegProxy(SwervePositions.alignMent.LEFT));
     Controls.Swerve.center.onTrue(SwerveCommands.driveToPegProxy(SwervePositions.alignMent.CENTER));

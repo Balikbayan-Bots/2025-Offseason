@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.SLOW_SPEED;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -38,6 +39,8 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
   private static SwerveSubsystem instance;
   static LimelightConfig limelight = LimelightConfigs.ReefLimelight;
   public int currentBestTag = -1;
+  private double speedMultiplier = 1.0;
+  private boolean isSlow = true;
 
   public static SwerveSubsystem getInstance() {
     if (instance == null) {
@@ -349,5 +352,17 @@ public class SwerveSubsystem extends TunerSwerveDrivetrain implements Subsystem 
 
   public int getCurrentBestTag() {
     return currentBestTag;
+
+  }
+  public void setSlowMode(boolean isSlowSpeed){
+    isSlow = isSlowSpeed;
+    speedMultiplier = isSlow ? SLOW_SPEED : 1.0;
+    
+  }
+  public void toggleSlowMode(){
+    setSlowMode(!isSlow);
+  }
+  public double getSpeedMultiplier() {
+    return speedMultiplier;
   }
 }
