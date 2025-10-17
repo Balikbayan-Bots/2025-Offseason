@@ -38,6 +38,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   private TalonFX leftMotor;
   private TalonFX rightMotor;
   private MotionMagicVoltage motionMagic;
+  private BodyStates state = BodyStates.SETPOINT;
 
   public ElevatorSubsystem() {
     leftMotor = new TalonFX(ELEV_MOTOR_LEFT);
@@ -119,6 +120,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     leftMotor.setPosition(0);
   }
 
+  public void setSpeed(double speed) {
+    state = BodyStates.MANUAL;
+    leftMotor.set(speed);
+    rightMotor.set(speed);
+  }
+
   public double getRotations() {
     return (leftMotor.getPosition().getValueAsDouble());
   }
@@ -149,6 +156,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (state == BodyStates.SETPOINT) {
     rightMotor.setControl(new Follower(leftMotor.getDeviceID(), true));
     updateReference(activeSetpoint.getElevTravel());
     leftMotor.setControl(
@@ -156,6 +164,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             .withPosition(inchesToMotorRotations(referenceInches))
             .withSlot(0)
             .withFeedForward(ELEV_FEED_FWD));
+    }
     // leftMotor.setControl(new CoastOut());
   }
 
