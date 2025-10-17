@@ -54,6 +54,7 @@ public class Bindings {
     Controls.Setpoint.lvlFour.onTrue(BodyCommands.positionLevelFour());
     Controls.Setpoint.algaeHigh.onTrue(BodyCommands.positionHighAlgae());
     Controls.Setpoint.netPos.onTrue(BodyCommands.positionNet());
+    Controls.Body.elevRezero.onTrue(BodyCommands.zeroElev());
   }
 
   public static void configureIntakeBinds() {

@@ -165,13 +165,13 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (state == BodyStates.SETPOINT) {
-    rightMotor.setControl(new Follower(leftMotor.getDeviceID(), true));
-    updateReference(activeSetpoint.getElevTravel());
-    leftMotor.setControl(
-        motionMagic
-            .withPosition(inchesToMotorRotations(referenceInches))
-            .withSlot(0)
-            .withFeedForward(ELEV_FEED_FWD));
+      rightMotor.setControl(new Follower(leftMotor.getDeviceID(), true));
+      updateReference(activeSetpoint.getElevTravel());
+      leftMotor.setControl(
+          motionMagic
+              .withPosition(inchesToMotorRotations(referenceInches))
+              .withSlot(0)
+              .withFeedForward(ELEV_FEED_FWD));
     }
     // leftMotor.setControl(new CoastOut());
   }

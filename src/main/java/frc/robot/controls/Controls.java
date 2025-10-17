@@ -76,6 +76,14 @@ public class Controls {
     public static final Trigger netPos = coDriver.povLeft();
   }
 
+  public class Body {
+    private Body() {
+      throw new IllegalStateException("Utility class");
+    }
+
+    public static final Trigger elevRezero = driver.povDown();
+  }
+
   public class Climb {
     private Climb() {
       throw new IllegalStateException("Utility class");
