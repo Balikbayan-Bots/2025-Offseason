@@ -184,5 +184,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     builder.addDoubleProperty("Error", this::getError, null);
     builder.addDoubleProperty("Inches", this::getInches, null);
     builder.addBooleanProperty("Is At Setpoint", this::isAtSetpoint, null);
+    builder.addBooleanProperty("Magnet Sensor", this::getMagnetSensor, null);
   }
 }
